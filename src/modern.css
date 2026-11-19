@@ -1,0 +1,48 @@
+/* Modern pass: muted palette, readable hero text, branch timeline, bubble pit. */
+:root { --muted: #b4bec9; --sage: #a8bfa9; --lilac: #b6aecb; --accent: #a9bfd4; }
+
+/* Readability: brighter text, a soft scrim behind the copy, and the stage sits above the dust. */
+.sequence-stage { z-index: 4; }
+em { color: inherit; }
+h1, h2 { color: #fff; }
+.eyebrow { color: #cbd3dc; font-size: 15px; }
+.hero-copy, .craft-copy { text-shadow: 0 1px 20px #0b0d10; }
+.hero-copy p, .craft-copy p { color: #d6dde5; font-size: 19px; }
+.hero-copy::before, .craft-copy::before { content: ''; position: absolute; inset: -14% -12% -14% -16%; z-index: -1; pointer-events: none; background: radial-gradient(ellipse at 42% 50%, #0b0d10e0, #0b0d1000 72%); }
+.scene-footer { color: #c3ccd6; }
+.text-link { border-bottom-color: #a9bfd4aa; font-size: 16px; }
+
+/* Glassy header and calmer cards */
+header { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.project-art { border-radius: 14px; }
+.tags span { border-radius: 999px; }
+.skill-grid > div { padding-left: 4px; }
+.skill-grid > div:nth-child(even) { padding-left: 30px; }
+
+/* Branching timeline */
+.timeline { padding-left: 112px; }
+.node { left: -112px; }
+.rail-fill { background: linear-gradient(var(--accent), var(--sage)); }
+.branch { position: absolute; left: -112px; top: 20px; width: 112px; height: calc(100% - 44px); pointer-events: none; }
+.branch svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.branch path { fill: none; stroke: var(--border); stroke-width: 2; stroke-dasharray: 4 5; transition: stroke 0.6s; }
+.milestone.is-reached .branch path { stroke: var(--sage); stroke-dasharray: none; }
+.commit { position: absolute; left: 63px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); border: 2px solid var(--border); transition: background 0.5s, border-color 0.5s; }
+.milestone.is-reached .commit { background: var(--sage); border-color: var(--sage); }
+.branch-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.branch-tags span { font-family: var(--mono); font-size: 12px; color: var(--muted); border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; }
+.branch-tags span:first-child { color: var(--sage); border-color: #a8bfa955; }
+.milestone { min-height: 44vh; }
+.milestone:last-child { min-height: 0; }
+
+/* Bubble pit */
+.bubbles { margin-top: 70px; }
+.bubbles small { display: block; margin-bottom: 14px; font-size: 14px; color: var(--muted); }
+.bubbles canvas { width: 100%; height: 440px; display: block; touch-action: pan-y; border: 1px solid var(--border); border-radius: 20px; background: radial-gradient(ellipse at 50% 110%, #1b2530, transparent 70%), #0f1318; }
+
+@media (max-width: 600px) {
+  .timeline { padding-left: 48px; }
+  .node { left: -48px; }
+  .branch { display: none; }
+  .bubbles canvas { height: 380px; }
+}
