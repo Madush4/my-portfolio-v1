@@ -189,10 +189,13 @@ function Art({ slug }: { slug: string }) {
   }
 }
 
+/** Paths like '/projects/x.webp' are made relative to the site's base (needed on GitHub Pages). */
+const asset = (src?: string) => (src && src.startsWith('/') ? import.meta.env.BASE_URL.replace(/\/$/, '') + src : src);
+
 export function ProjectVisual({ p, eager = false }: { p: Project; eager?: boolean }) {
   if (p.video)
-    return <video className="project-media" src={p.video} poster={p.image} muted loop playsInline autoPlay preload={eager ? 'auto' : 'metadata'} />;
-  if (p.image) return <img className="project-media" src={p.image} alt={`${p.title} screenshot`} loading={eager ? 'eager' : 'lazy'} />;
+    return <video className="project-media" src={asset(p.video)} poster={asset(p.image)} muted loop playsInline autoPlay preload={eager ? 'auto' : 'metadata'} />;
+  if (p.image) return <img className="project-media" src={asset(p.image)} alt={`${p.title} screenshot`} loading={eager ? 'eager' : 'lazy'} />;
   return <Art slug={p.slug} />;
 }
 

@@ -32,7 +32,7 @@ export const useSmallFrames = () => matchMedia('(max-width: 900px), (pointer: co
 
 export const frameUrl = (key: SeqKey, i: number) => {
   const { dir, mobileDir, prefix, ext, pad } = sequences[key];
-  return `${useSmallFrames() ? mobileDir : dir}/${prefix}${String(i + 1).padStart(pad, '0')}.${ext}`;
+  return `${import.meta.env.BASE_URL.replace(/\/$/, '')}${useSmallFrames() ? mobileDir : dir}/${prefix}${String(i + 1).padStart(pad, '0')}.${ext}`;
 };
 
 /**
