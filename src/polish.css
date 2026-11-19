@@ -210,7 +210,7 @@ em { color: var(--accent); }
 
 /* ---------- Case study dialog ---------- */
 dialog { width: min(920px, 92vw); border-radius: 22px; padding: 48px; background: #0d1015; }
-dialog[open] { animation: pop 0.55s var(--ease); }
+dialog[open] > * { animation: pop 0.55s var(--ease) both; }
 dialog[open]::backdrop { animation: fade 0.4s; }
 @keyframes pop { from { opacity: 0; transform: translateY(30px) scale(0.97); } }
 @keyframes fade { from { opacity: 0; } }
@@ -420,3 +420,6 @@ dialog[open]::backdrop { animation: fade 0.4s; }
   .stack-items { max-height: none; opacity: 1; margin-top: 12px; padding-left: 0; }
   .stack-groups li.is-dim { opacity: 1; }
 }
+
+/* The cursor glow would sit behind the popup's content; it is not needed there. */
+dialog .cursor-glow { display: none; }

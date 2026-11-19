@@ -1,4 +1,5 @@
-import { Fragment, useEffect, useRef, type ElementType } from 'react';
+import { Fragment, useEffect, useRef, useState, type ElementType } from 'react';
+import { createPortal } from 'react-dom';
 import { clamp, prefersReducedMotion, subscribe } from './motion';
 
 /* ======================================================================
@@ -11,7 +12,7 @@ import { clamp, prefersReducedMotion, subscribe } from './motion';
    - A soft blue glow drifts after it in the background.
    Only on devices with a real mouse; touch screens keep their normal behaviour.
    ====================================================================== */
-type Mode = 'idle' | 'text' | 'snap' | 'big' | 'label';
+type Mode = 'idle' | 'text' | 'snap' | 'big' | 'label' | 'filled';
 const TEXT_SEL = 'h1, h2, h3, .split, .finale-words, .marquee, .outro-title';
 const LINK_SEL = 'a, button, [role="button"], .stack-groups li';
 
@@ -20,6 +21,16 @@ export function Cursor() {
   const tag = useRef<HTMLDivElement>(null);
   const tagText = useRef<HTMLSpanElement>(null);
   const glow = useRef<HTMLDivElement>(null);
+  // An open <dialog> sits in the browser's "top layer", above any z-index.
+  // While one is open, the cursor is rendered inside it so it stays visible.
+  const [host, setHost] = useState<HTMLElement>(document.body);
+
+  useEffect(() => {
+    const sync = () => setHost(document.querySelector<HTMLDialogElement>('dialog[open]') ?? document.body);
+    const mo = new MutationObserver(sync);
+    mo.observe(document.body, { subtree: true, attributes: true, attributeFilter: ['open'] });
+    return () => mo.disconnect();
+  }, []);
 
   useEffect(() => {
     if (prefersReducedMotion() || !matchMedia('(pointer: fine)').matches) return;
@@ -33,6 +44,9 @@ export function Cursor() {
     let tScale = 0, cScale = 0;
     let mode: Mode = 'idle';
     let snapEl: HTMLElement | null = null;
+    // Buttons that already have a shape are covered exactly; plain text links get a pill around them.
+    let snapTight = false;
+    let snapRadius = 0;
     let magnet: HTMLElement | null = null;
     let shown = false;
     let pressed = false;
@@ -66,8 +80,17 @@ export function Cursor() {
         const b = link.getBoundingClientRect();
         if (link.classList.contains('magnetic') && b.width > 120) mode = 'big';
         else if (b.width < 420 && b.height < 90) {
-          mode = 'snap';
-          snapEl = link;
+          const cs = getComputedStyle(link);
+          if (cs.backgroundColor !== 'rgba(0, 0, 0, 0)' && !link.matches('nav a')) {
+            // Solid buttons have their own hover colour; inverting it looks muddy,
+            // so the cursor shrinks to a dot and lets the button do the talking.
+            mode = 'filled';
+          } else {
+            mode = 'snap';
+            snapEl = link;
+            snapTight = parseFloat(cs.borderTopWidth) > 0;
+            snapRadius = parseFloat(cs.borderTopLeftRadius) || 0;
+          }
         } else mode = 'big';
       } else if (t.closest(TEXT_SEL)) mode = 'text';
       else mode = 'idle';
@@ -107,17 +130,21 @@ export function Cursor() {
         tw = th = 64;
         tr = 32;
         k = 0.2;
+      } else if (mode === 'filled') {
+        tw = th = 6;
+        tr = 3;
       } else if (mode === 'label') {
         tw = th = 8;
         tr = 4;
       } else if (mode === 'snap' && snapEl) {
         const b = snapEl.getBoundingClientRect();
         // Wrap the element, leaning a little toward the pointer.
-        tx = b.left + b.width / 2 + (x - (b.left + b.width / 2)) * 0.12;
-        ty = b.top + b.height / 2 + (y - (b.top + b.height / 2)) * 0.18;
-        tw = b.width + 22;
-        th = b.height + 12;
-        tr = Math.min(th / 2, 18);
+        const lean = snapTight ? 0.05 : 0.12;
+        tx = b.left + b.width / 2 + (x - (b.left + b.width / 2)) * lean;
+        ty = b.top + b.height / 2 + (y - (b.top + b.height / 2)) * lean;
+        tw = b.width + (snapTight ? 0 : 22);
+        th = b.height + (snapTight ? 0 : 12);
+        tr = snapTight ? Math.min(snapRadius, th / 2) : Math.min(th / 2, 18);
         k = 0.22;
       }
       if (pressed) {
@@ -153,14 +180,15 @@ export function Cursor() {
     };
   }, []);
 
-  return (
+  return createPortal(
     <>
       <div ref={glow} className="cursor-glow" aria-hidden="true" />
       <div ref={blob} className="cursor-blob" data-mode="idle" aria-hidden="true" />
       <div ref={tag} className="cursor-tag" aria-hidden="true">
         <span ref={tagText} />
       </div>
-    </>
+    </>,
+    host,
   );
 }
 
