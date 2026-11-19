@@ -76,7 +76,6 @@ export const projects: Project[] = [
     year: "2026",
     status: "Live",
     links: {
-      live: "https://codecrew.inusha.me",
       code: "https://github.com/inusha-thathsara/CodeCrew_Waypoint",
     },
     tint: "#ffc940",
@@ -96,7 +95,7 @@ export const projects: Project[] = [
     stack: ["ESP32", "LoRa", "Firebase", "React Native", "Expo"],
     year: "2025",
     links: {
-      live: "#",
+      
       code: "https://github.com/Madush4/Smart-Elephant-Detective-Project",
     },
     tint: "#ff8a3d",
@@ -122,7 +121,7 @@ export const projects: Project[] = [
       "SQLite",
     ],
     year: "2026",
-    links: { live: "#", code: "https://github.com/Madush4/DevPulse" },
+    links: {  code: "https://github.com/Madush4/DevPulse" },
     tint: "#3ddc97",
   },
   {
@@ -156,7 +155,7 @@ export const projects: Project[] = [
     stack: ["JavaScript", "Tailwind CSS", "TMDB API", "HTML"],
     year: "2025",
     links: {
-      live: "#",
+      
       code: "https://github.com/Madush4/CIneMatch-Movie-Recommendation-Project",
     },
     tint: "#ff4d6d",
